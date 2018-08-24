@@ -1,0 +1,37 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- Flyway configuration -->
+	<bean id="flyway" class="org.Flyway.core.Flyway"
+		init-method="migrate">
+		<property name="baselineOnMigrate" value="true" />
+		<property name="locations"
+			value="filesystem:schema.sql" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Entity Manager Factory configuration -->
+	<bean id="entityManagerFactory"
+		class="o.s.orm.jpa.LocalContainerEntityManagerFactoryBean"
+		depends-on="flyway">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter">
+			<bean class="o.s.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="database" value="${jpa.database}" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- an example of a data source -->
+	<bean id="dataSource" class="o.a.commons.dbcp.BasicDataSource"
+		lazy-init="true" destroy-method="close">
+		<property name="driverClassName"
+			value="org.h2.Driver" />
+		<property name="url" value="jdbc:h2:mem:testdb" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+</beans>

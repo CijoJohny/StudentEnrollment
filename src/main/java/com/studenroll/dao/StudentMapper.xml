@@ -1,0 +1,124 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.studenroll.dao.StudentMapper">
+	<select id="getStudentId" parameterType="string"
+		fetchSize="1000" resultType="java.lang.Integer">
+		select student_id from student where name
+		=#{studentName} ;
+	</select>
+
+	<select id="getCourseIdByName" parameterType="java.util.List"
+		resultType="java.lang.Integer">
+		SELECT course_id FROM course
+		<where>
+			<if test="list != null">
+				name in
+				<foreach item="itemList" index="index" collection="list"
+					open='(' separator=',' close=')'>
+					#{itemList}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<select id="getStudentInfoByCourseName" parameterType="String"
+		resultType="String">
+		SELECT distinct(st.name) FROM ENROLLMENT enrol,course
+		cour,student st
+		where st.student_id = enrol.student_id and
+		enrol.course_id = cour.COURSE_ID
+		and cour.name =#{courseName}
+		ORDER BY
+		st.name;
+	</select>
+
+
+	<select id="getUnenrolledStudnetList" resultType="String">
+		SELECT
+		distinct(stud.name)
+		FROM STUDENT stud
+		LEFT JOIN enrollment enrol ON
+		enrol.student_id = stud.student_id
+		WHERE enrol.student_id IS NULL
+	</select>
+
+
+
+
+	<resultMap id="StudentDetailsMap"
+		type="com.studenroll.dao.Student">
+		<result column="NAME" property="studentName" />
+		<result column="STUDENT_ID" property="studentId" />
+	</resultMap>
+
+	<select id="getStudentDetails" parameterType="string"
+		fetchSize="1000" resultMap="StudentDetailsMap"
+		resultType="com.studenroll.dao.Student">
+		select STUDENT_ID,NAME from student where student_id
+		=#{studentId} ;
+	</select>
+
+	<insert id="insertStudent"
+		parameterType="com.studenroll.dao.Student" flushCache="true"
+		useGeneratedKeys="true" statementType="PREPARED">
+		insert into
+		student(student_id,name,CONTACT_NAME,STATUS)values(#{studentId},#{studentName},#{contactName},'ACTIVE');
+		<selectKey keyProperty="studentId" resultType="int"
+			order="BEFORE">
+			SELECT STUDENT_ID_SEQ.nextval from dual
+		</selectKey>
+
+	</insert>
+
+	<update id="updateMarkForCourse">
+		update enrollment set mark =#{score} where oid =#{oid}
+		<selectKey keyProperty="oid" resultType="int" order="BEFORE">
+			select
+			enrol.oid from enrollment enrol,student stud,course cour
+			where
+			stud.name =#{studentName} and cour.name =#{courseName}
+			and
+			cour.course_id = enrol.course_id and stud.student_id =
+			enrol.student_id
+		</selectKey>
+	</update>
+
+	<insert id="insertCourse" parameterType="java.util.List">
+
+		INSERT INTO course (course_id,name,course_description,status) values
+		<foreach collection="list" item="element" index="index"
+			separator=",">
+			(COURSE_ID_SEQ.nextval,#{element.courseName},#{element.courseDescription},#{element.status})
+		</foreach>
+		<selectKey keyProperty="courseId" resultType="int"
+			order="BEFORE">
+			SELECT COURSE_ID_SEQ.nextval from dual
+		</selectKey>
+
+	</insert>
+
+	<delete id="deleteStudentInfo" parameterType="java.lang.Integer">
+		delete from student
+		where student_id =#{studentId} ;
+	</delete>
+
+	<delete id="deleteEnrollmentInfo"
+		parameterType="java.lang.Integer">
+		delete from enrollment where
+		student_id =#{studentId} ;
+	</delete>
+
+
+
+	<insert id="insertEnrollment">
+		INSERT INTO enrollment (OID,STUDENT_ID,COURSE_ID,status) values
+		<foreach collection="courseIdList" item="courseId"
+			index="index" separator=",">
+			(ENROLLMENT_ID_SEQ.nextval,#{studentId},#{courseId},'ACTIVE')
+		</foreach>
+
+	</insert>
+
+</mapper>
