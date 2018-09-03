@@ -30,6 +30,9 @@ public interface StudentMapper {
 	int updateMarkForCourse(@Param("courseName")  String courseName,@Param("studentName") String studentName,@Param("score")  int score);
 	
 	int insertEnrollment(@Param("studentId") int studentId,@Param("courseIdList")  List<Integer> courseIdList);
+	  
+	StudEnrollment getStudentEnrolmentDetails(@Param("studentName") String studentName);
+	  
 	
 
 }

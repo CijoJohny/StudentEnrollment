@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.studenroll.dao.Course;
+import com.studenroll.dao.StudEnrollment;
 import com.studenroll.dao.Student;
 import com.studenroll.dao.StudentMapper;
 
@@ -18,6 +19,7 @@ public class StudEnrollServiceImpl implements StudEnrollService {
 
 	@Override
 	public String getStudentList(String studentId) {
+		int i=0;
 
 		Student dao = new Student();
 		dao.setContactName("Thalackal");
@@ -62,6 +64,10 @@ public class StudEnrollServiceImpl implements StudEnrollService {
 		//Student dao1 = studentMapper.getStudentDetails(studentId);
 		// System.out.println("stud" +dao1.getStudentName());
 		// System.out.println("stud" +dao1.getStudentId());
+		StudEnrollment stEnrol = studentMapper.getStudentEnrolmentDetails("Tiger" +i);
+		System.err.println(stEnrol);
+		
+		  
 		return null;
 	}
 

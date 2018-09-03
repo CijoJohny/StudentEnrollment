@@ -43,15 +43,14 @@
 		enrol.student_id = stud.student_id
 		WHERE enrol.student_id IS NULL
 	</select>
-
-
-
-
 	<resultMap id="StudentDetailsMap"
 		type="com.studenroll.dao.Student">
 		<result column="NAME" property="studentName" />
 		<result column="STUDENT_ID" property="studentId" />
 	</resultMap>
+
+
+
 
 	<select id="getStudentDetails" parameterType="string"
 		fetchSize="1000" resultMap="StudentDetailsMap"
@@ -120,5 +119,38 @@
 		</foreach>
 
 	</insert>
+
+
+	<resultMap id="StudentSummaryMap"
+		type="com.studenroll.dao.StudEnrollment">
+		<result column="STUDENT_ID" property="studentId" />
+		<result column="NAME" property="studentName" />
+		<collection property="studEnrollment"
+			ofType="com.studenroll.dao.Enrollment">
+			<result column="course_Id" property="courseId" />
+			<result column="mark" property="mark" />
+			<result column="courseName" property="courseName" />
+		</collection>
+	</resultMap>
+
+
+	<select id="getStudentEnrolmentDetails" parameterType="string"
+		fetchSize="1000" resultType="com.studenroll.dao.StudEnrollment"
+		resultMap="StudentSummaryMap">
+		select
+		ST.STUDENT_ID,ST.NAME,ST.STATUS,en.course_Id,en.mark,en.status,cr.NAME
+		as courseName from ENROLLMENT en, course cr,STUDENT st
+		where st.student_id = en.student_id
+		and en.course_id =cr.course_id
+		and st.name=#{studentName} ;
+	</select>
+
+
+	<select id="EnrollmentDetailsMap" fetchSize="1000"
+		resultType="com.studenroll.dao.Enrollment">
+		SELECT student_id,course_id,mark,status FROM ENROLLMENT
+		where student_id
+		=#{studentId} ;
+	</select>
 
 </mapper>
